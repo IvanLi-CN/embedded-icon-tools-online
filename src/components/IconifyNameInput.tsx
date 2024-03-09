@@ -1,14 +1,28 @@
 import { iconifyName, setIconifyName } from "../states/iconify-name";
+import {
+  outputHeight,
+  outputWidth,
+  setOutputHeight,
+  setOutputWidth,
+} from "../states/output-dimissions";
 
 const IconifyNameInput = () => {
-  const onInput = (e: InputEvent) => {
+  const onInput = (e: Event) => {
     const { value } = e.target as HTMLInputElement;
 
     setIconifyName(value);
   };
 
-  const onSizeChange = (e: InputEvent) => {
+  const onWidthChange = (e: Event) => {
     const { value } = e.target as HTMLInputElement;
+
+    setOutputWidth(Number(value));
+  };
+
+  const onHeightChange = (e: Event) => {
+    const { value } = e.target as HTMLInputElement;
+
+    setOutputHeight(Number(value));
   };
 
   return (
@@ -25,18 +39,18 @@ const IconifyNameInput = () => {
         <div class="flex gap-2 items-center">
           <input
             type="text"
-            placeholder="Type Icon Name here"
+            placeholder="Width"
             class="input input-bordered"
-            onInput={onInput}
-            value={iconifyName() ?? ""}
+            onBlur={onWidthChange}
+            value={outputWidth() ?? ""}
           />
           <span class="icon-[mdi--close] h-8 w-8"></span>
           <input
             type="text"
-            placeholder="Type Icon Name here"
+            placeholder="Height"
             class="input input-bordered"
-            onInput={onInput}
-            value={iconifyName() ?? ""}
+            onBlur={onHeightChange}
+            value={outputHeight() ?? ""}
           />
         </div>
       </div>

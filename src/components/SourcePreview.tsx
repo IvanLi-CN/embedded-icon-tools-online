@@ -1,7 +1,10 @@
 import { Component, createEffect, onCleanup } from "solid-js";
+import { drawGridForCanvas } from "../helpers/canvas-grid";
 
 interface SourcePreviewerProps {
   blob: Blob;
+  width?: number;
+  height?: number;
 }
 
 const SourcePreviewer: Component<SourcePreviewerProps> = (props) => {
@@ -18,29 +21,16 @@ const SourcePreviewer: Component<SourcePreviewerProps> = (props) => {
     }
 
     const dpr = window.devicePixelRatio;
-    canvas.width = 200 * dpr;
-    canvas.height = 200 * dpr;
-    canvas.style.width = "200px";
-    canvas.style.height = "200px";
 
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const width = props.width ?? 200;
+    const height = props.height ?? 200;
 
-    const gridSize = 20; // 网格大小
-    const canvasWidth = canvas.width;
-    const canvasHeight = canvas.height;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
 
-    ctx.fillStyle = "#e7e7e7";
-
-    for (let x = 0; x < canvasWidth; x += gridSize) {
-      for (
-        let y = (x / gridSize) % 2 === 0 ? 0 : gridSize;
-        y < canvasHeight;
-        y += gridSize * 2
-      ) {
-        ctx.fillRect(x, y, gridSize, gridSize);
-      }
-    }
+    drawGridForCanvas(canvas);
 
     const url = URL.createObjectURL(props.blob);
 
