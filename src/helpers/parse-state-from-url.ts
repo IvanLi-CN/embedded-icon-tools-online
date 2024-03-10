@@ -12,5 +12,6 @@ export const parseStateFromUrl = () => {
     iconifyName,
     outputWidth: Number(url.searchParams.get("width")) || undefined,
     outputHeight: Number(url.searchParams.get("height")) || undefined,
+    color: url.searchParams.get("color") || undefined,
   };
 };

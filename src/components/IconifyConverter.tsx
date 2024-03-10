@@ -3,6 +3,7 @@ import { iconifyName$ } from "../states/iconify-name";
 import { fromFetch } from "rxjs/fetch";
 import {
   catchError,
+  combineLatestWith,
   debounceTime,
   distinctUntilChanged,
   filter,
@@ -12,9 +13,16 @@ import {
 } from "rxjs";
 import SourcePreviewer from "./SourcePreview";
 import { drawGridForCanvas } from "../helpers/canvas-grid";
-import { outputHeight, outputWidth } from "../states/output-dimissions";
+import { outputHeight, outputWidth } from "../states/output-dimensions";
 import { thresholdConvert } from "../helpers/threshold-convert";
 import DownloadRGB565 from "./DownloadRGB565";
+import {
+  bgColor,
+  color$,
+  colorful,
+  threshold,
+  transparent,
+} from "../states/color";
 
 const [errorMsg, setErrorMsg] = createSignal<string | undefined>(undefined);
 
@@ -24,8 +32,13 @@ export const IconifyConverter = () => {
     debounceTime(500),
     filter(Boolean),
     map((name) => name.split(":")),
-    switchMap(([prefix, name]) =>
-      fromFetch(`https://api.iconify.design/${prefix}/${name}.svg`, {
+    combineLatestWith(color$),
+    switchMap(([[prefix, name], color]) => {
+      const url = new URL(`https://api.iconify.design/${prefix}/${name}.svg`);
+      if (color) {
+        url.searchParams.set("color", color);
+      }
+      return fromFetch(url.href, {
         selector: (res) => res.arrayBuffer(),
       }).pipe(
         catchError((err) => {
@@ -33,8 +46,8 @@ export const IconifyConverter = () => {
           setErrorMsg(err.message);
           return of(null);
         }),
-      ),
-    ),
+      );
+    }),
   );
 
   const blob = from(
@@ -84,32 +97,49 @@ export const IconifyConverter = () => {
 
     const imgWidth = outputWidth();
     const imgHeight = outputHeight();
+    const _transparent = transparent()!;
+    const _colorful = colorful()!;
+    const _threshold = threshold()!;
+    const _bgColor = bgColor();
+
+    const tmpCanvas = document.createElement("canvas");
+    const tmpCtx = tmpCanvas.getContext("2d");
+
+    if (!tmpCtx) {
+      console.error("get tmpCtx failed");
+      return;
+    }
+    onCleanup(() => {
+      tmpCanvas.remove();
+    });
 
     const img = new Image();
     img.src = url;
     img.onload = () => {
+      img.onload = null;
+
       const _imgWidth = imgWidth ?? img.width;
       const _imgHeight = imgHeight ?? img.height;
 
-      canvas.width = _imgWidth;
-      canvas.height = _imgHeight;
+      tmpCanvas.width = _imgWidth;
+      tmpCanvas.height = _imgHeight;
 
-      ctx.imageSmoothingEnabled = false;
-      const transparent = 0;
-      if (!transparent) {
-        ctx.fillStyle = "#fff";
-        ctx.fillRect(0, 0, _imgWidth, _imgHeight);
+      tmpCtx.imageSmoothingEnabled = false;
+      if (!_transparent) {
+        tmpCtx.fillStyle = _bgColor ?? "#fff";
+        tmpCtx.fillRect(0, 0, _imgWidth, _imgHeight);
       }
-      ctx.drawImage(img, 0, 0, _imgWidth, _imgHeight);
+      tmpCtx.drawImage(img, 0, 0, _imgWidth, _imgHeight);
 
-      const imageData = ctx.getImageData(0, 0, _imgWidth, _imgHeight);
-      thresholdConvert(ctx, imageData, 128, 1, transparent);
+      const imageData = tmpCtx.getImageData(0, 0, _imgWidth, _imgHeight);
+      thresholdConvert(tmpCtx, imageData, _threshold, _colorful, _transparent);
       setImageData(imageData);
 
       const resultImage = new Image();
-      resultImage.src = canvas.toDataURL("image/png");
+      resultImage.src = tmpCanvas.toDataURL("image/png");
 
       resultImage.onload = () => {
+        resultImage.onload = null;
         const dpr = window.devicePixelRatio;
 
         canvas.width = width * dpr;
@@ -133,8 +163,8 @@ export const IconifyConverter = () => {
   });
 
   return (
-    <div>
-      <div class="flex flex-row gap-2">
+    <div class="flex flex-col gap-4">
+      <div class="flex flex-row gap-2 justify-evenly">
         <Show when={blob()}>
           <SourcePreviewer blob={blob()!} />
         </Show>
@@ -143,7 +173,7 @@ export const IconifyConverter = () => {
       <Show when={errorMsg()}>
         <div class="alert alert-error shadow-lg">{errorMsg()}</div>
       </Show>
-      <div>
+      <div class="flex flex-row gap-2 justify-evenly">
         <DownloadRGB565 imageData={imageData()} />
       </div>
     </div>

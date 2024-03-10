@@ -8,9 +8,6 @@ dependencies:
   '@iconify/tailwind':
     specifier: ^0.1.4
     version: 0.1.4
-  '@solidjs/router':
-    specifier: ^0.13.0
-    version: 0.13.0(solid-js@1.8.11)
   clsx:
     specifier: ^2.1.0
     version: 2.1.0
@@ -1003,14 +1000,6 @@ packages:
     dependencies:
       solid-js: 1.8.11
     dev: true
-
-  /@solidjs/router@0.13.0(solid-js@1.8.11):
-    resolution: {integrity: sha512-YHLbFv9J53+iG4yVrh0vVdYiyXPTk892UyZ1jiMPsUXn2dYkX4552N+8SjvlKWWsmNmYxaoefM6jZn1YtVIUUg==}
-    peerDependencies:
-      solid-js: ^1.8.6
-    dependencies:
-      solid-js: 1.8.11
-    dev: false
 
   /@types/babel__core@7.20.5:
     resolution: {integrity: sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA==}
