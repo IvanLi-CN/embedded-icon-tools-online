@@ -1,34 +1,41 @@
-## Usage
+# Embedded Icon Tools Online
 
-Those templates dependencies are maintained via [pnpm](https://pnpm.io) via `pnpm up -Lri`.
+A WebApp tool for image format conversion for embedded development.
 
-This is the reason you see a `pnpm-lock.yaml`. That being said, any package manager will work. This file can be safely be removed once you clone a template.
+![Screenshot](./docs/screenshot.png)
+
+## Building the App
+
+### Install the dependencies
 
 ```bash
-$ npm install # or pnpm install or yarn install
+npm install
 ```
 
-### Learn more on the [Solid Website](https://solidjs.com) and come chat with us on our [Discord](https://discord.com/invite/solidjs)
+### Build the app
 
-## Available Scripts
+```bash
+npm run build
+```
 
-In the project directory, you can run:
+### Run the app
 
-### `npm run dev` or `npm start`
+```bash
+npm run start
+```
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+the app will be available at `http://localhost:4173`.
 
-The page will reload if you make edits.<br>
+Learn more on the [Solid Website](https://solidjs.com).
 
-### `npm run build`
+## Development
 
-Builds the app for production to the `dist` folder.<br>
-It correctly bundles Solid in production mode and optimizes the build for the best performance.
+```bash
+npm run dev
+```
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+the app will be available at `http://localhost:24030`.
 
-## Deployment
+## License
 
-You can deploy the `dist` folder to any static host provider (netlify, surge, now, etc.)
+MIT License.
